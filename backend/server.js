@@ -2,35 +2,44 @@ require("dotenv").config();
 
 const express = require("express");
 const mongoose = require("mongoose");
-const bookingRoutes = require("./routes/booking");
+
+const {
+  createListing,
+  getListings,
+  getListing,
+} = require("./controllers/listingController");
+
+require("dotenv").config();
 
 const app = express();
-
-// initial app router to test api
-// app.get("/", (req, res) => {
-//   res.json({ message: "Welcome to the Booking app" });
-// });
 
 // middleware
 app.use(express.json());
 app.use((req, res, next) => {
   console.log(req.path, req.method);
+  if (req.body) {
+    console.log("Request body:");
+    console.log(req.body);
+  }
   next();
 });
 
-//routes
-app.use("/api/bookings", bookingRoutes);
+// Start the server..
+const port = process.env.PORT || 4000;
+app.listen(port, () => {
+  console.log(`Server running on port ${port}`);
+});
 
-//connect to database
+// Connect to MongoDB
 mongoose
-  .connect(process.env.MONGO_URI)
+  .connect(process.env.MONGODB_URI)
   .then(() => {
-    app.listen(process.env.PORT, () => {
-      console.log("listening to port 4000 and connected to db");
-    });
+    console.log("Connected to MongoDB");
   })
   .catch((error) => {
-    console.log(error);
+    console.error("Error connecting to MongoDB:", error.message);
   });
 
-// listening to requests
+app.get("/allListings", getListings);
+app.get("/:id", getListing);
+app.post("/MakeAListing", createListing);
