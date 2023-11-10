@@ -3,12 +3,6 @@ require("dotenv").config();
 const express = require("express");
 const mongoose = require("mongoose");
 
-const {
-  createListing,
-  getListings,
-  getListing,
-} = require("./controllers/listingController");
-
 require("dotenv").config();
 
 const app = express();
@@ -24,10 +18,13 @@ app.use((req, res, next) => {
   next();
 });
 
+app.use("/api/booking", require("./routes/listingRoutes"));
+app.use("/api/users", require("./routes/userRoutes"));
+
 // Start the server..
 const port = process.env.PORT || 4000;
 app.listen(port, () => {
-  console.log(`Server running on port ${port}`);
+  console.log(`Server running on port: ${port}`);
 });
 
 // Connect to MongoDB
@@ -39,7 +36,3 @@ mongoose
   .catch((error) => {
     console.error("Error connecting to MongoDB:", error.message);
   });
-
-app.get("/allListings", getListings);
-app.get("/:id", getListing);
-app.post("/MakeAListing", createListing);
